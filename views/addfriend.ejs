@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <title>ADD Friends</title>
+   
+
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class ="col-6">
+                <p id="getId" style="display:none"><%= obj._id %></p>
+                <p id="getFriend" style="display:none"><%= obj.friend %></p>
+                <h2>Add Friends</h2>
+                <div id="add-friends">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+    var id = $('#getId').text();
+    console.log(id);
+    var ob = new Object();
+    ob.id = "<%= obj._id%>"
+    ob.friends = "<%= obj.friends %>"
+
+    console.log(ob);
+
+    var request = new XMLHttpRequest();
+    var filename = '/addFriends'
+    request.open('POST',filename)
+    request.setRequestHeader("content-Type","application/JSON")
+    request.send(JSON.stringify(ob));
+    request.onload = function()
+    {
+            
+       console.log(request.responseText);
+    
+    }
+
+
+</script>
+
+</html>

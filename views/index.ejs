@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat</title>
+    <style>
+        #chat
+        {
+            height:550px;
+        }
+        #chatWrap{
+            float : left;
+            border : 1px #000 solid;
+        }
+        
+        .error
+        {
+            color:red;
+        }
+        .wisper
+        {
+            color:gray;
+            font-style: italic;
+        }
+    </style>
+
+</head>
+<body>
+
+    <!-- <div id="nickWrap">
+        <label>Enter a user name</label>
+        <p id="nickError"></p>
+        <form id="setNick">
+            <input size="35" id="nickname"/>
+            <input type="submit" />
+        </form>
+    </div> -->
+
+   <div id="contentWrap">
+       <p id="getname" style="display: none;"><%= ob.username%></p>
+       <div id="chatWrap">
+            <div id="chat"></div>
+                <form id="send-message">
+                    <input size="35" id="message" />
+                    <input type="submit" />
+                </form>
+       </div>
+       <div id="users">
+       </div>
+   </div>
+
+
+    <script src = "http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+            jQuery(function($){
+                var socket = io.connect();
+                var $messageForm = $('#send-message')
+                var $messageBox = $('#message')
+                var $chat = $('#chat')
+                
+
+                socket.emit('new user',$('#getname').text(),function(data){
+                        if(data)
+                        {
+                           console.log('valid user')
+                        }
+                        else{
+                            // $nickError.html('That user name is already taken try another')
+                            console.log(error)
+                        }
+                    })
+
+
+                socket.on('usernames',function(data){
+
+                    var html = ' ';
+                    for(i=0;i<data.length;i++)
+                    {
+                        html+=data[i]+'<br/>'
+                    }
+                    $('#users').html(html)
+                })
+
+                $messageForm.submit(function(e){
+                    e.preventDefault();
+                    socket.emit('send message',$messageBox.val(),function(data){
+                        // addd stuff later
+                        $chat.append('<span class="error"><b>'+data+ '</span><br/>')
+
+
+                    })
+                    $('#messageBox').val() = ' ';
+                })
+
+                socket.on('new message',function(data){
+                    $chat.append('<b>'+ data.nick + '</b>'+ data.msg+ "<br/>")
+                })
+
+                socket.on('wisper' , function(data){
+                    $chat.append('<span class="wisper"><b>'+data.nick + '</b>'+ data.msg + '</span><br/>')
+                })
+
+             });
+    </script>
+</body>
+</html>
