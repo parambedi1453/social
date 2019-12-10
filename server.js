@@ -254,35 +254,93 @@ app.post('/acceptRequest' , function(req,res){
     })
 })
 
+app.post('/addchatToDb' , (req,res)=>{
 
+    var chatid = req.body.chatid;
+    var ob = {}
+    ob.senderName = req.body.senderName
+    ob.chat = req.body.chat
+    chatinstance.updateOne({"_id" : chatid},{$push :{message  : ob}},function(err,result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log(result)
+            res.send('chat added to db')
+        }
+    })
+})
 
+app.post('/getChatHistory' , function(req,res){
 
+    chatinstance.findOne({"_id" : req.body.chatid}).select('message').exec(function(err,result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log('send chat hostory')
+            res.send(result)
+        }
+    })
+       
+})
 
+users = {}
+io.sockets.on('connection' ,function(socket){
 
+        socket.on('new user' , function(data,callback){
+            if(data in users){
+                callback(false)
+            }else{
+                callback(true)
+                users[data] = socket
+                
+                // io.sockets.emit('usernames',nicknames)
+               
+            }
+        })
 
+        socket.on('send-message' , function(data,callback){
 
+            console.log('IN SEND MESSG')
+            console.log(data)
+            if(data.recieverid in users)
+            {
+                //users[name].emit('wisper' ,{msg :msg,nick : socket.nickname})
+
+                users[data.recieverid].emit('wisper' ,{msg :data.chat , senderName : data.senderName ,senderid : data.senderid})
+                console.log('usrr is online and messg sent')
+                callback('usrr is online and messg sent');
+            }
+            else
+            {
+                console.log('user is not online and mesg sent to chatDb')
+                callback('user is not online and mesg sent to chatDb')
+            }
+        })
+ })
 
 
 
 
 //   app.listen(3000,()=> console.log('server is running'))
 
-users = {}
+// users = {}
 
-io.sockets.on('connection' ,function(socket){
+// io.sockets.on('connection' ,function(socket){
 
-    socket.on('new user' , function(data,callback){
-        if(data in users){
-            callback(false)
-        }else{
-            callback(true)
-            users[data] = socket.id
+//     socket.on('new user' , function(data,callback){
+//         if(data in users){
+//             callback(false)
+//         }else{
+//             callback(true)
+//             users[data] = socket.id
             
-            // io.sockets.emit('usernames',nicknames)
+//             // io.sockets.emit('usernames',nicknames)
            
-        }
-    })
-})
+//         }
+//     })
+// })
 
 //     socket.on('send message' , function(data,callback){
 

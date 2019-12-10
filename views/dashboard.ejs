@@ -53,7 +53,8 @@
                 <div id="contentWrap">
                     <div id="chatWrap">
                         <center><div id="chatTop"></div></center>
-                         <div id="chat" style="height:450px;border : 1px #000 solid;"></div>
+                         <div id="chat" style="height:450px;border : 1px #000 solid;">
+                        </div>
                              <form id="send-message">
                                  <input size="35" id="message" />
                                  <input type="submit" />
@@ -72,39 +73,75 @@
 <script>
 
     const senderid  = "<%= obj._id %>"
-    let recieverid ;
+    let currReceiverid;
+    let currPersonchatid;
     var socket = io.connect();
     var $messageForm = $('#send-message')
 
 
-    // socket.emit('new user' ,senderid ,function(data){
-    //     if(data)
-    //     {
-    //         console.log('Valid User ')
-    //     }
-    //     else
-    //     {
-    //         console.log('not valid already logged in')
-    //     }
-    // })
-    // $messageForm.submit(function(e){
-    //         e.preventDefault();
+    socket.emit('new user' ,senderid ,function(data){
+        if(data)
+        {
+            console.log('Valid User ')
+        }
+        else
+        {
+            console.log('not valid already logged in')
+        }
+    })
+    socket.on('wisper' , function(data){
+        console.log('@@@@@@@@@   IN WISPERRR @@@@@@@@@'+data.senderName)
+        console.log(data)
+        if(data.senderid == currReceiverid)
+        {
+            var ob = {}
+            ob.senderName = data.senderName
+            ob.chat = data.msg
+            addChatHistoryDom(ob)
+        }
 
-    //         var ob = new Object()
-    //         ob.id =  recieverid;
-    //         ob.chat = $('#message').val();
+    })
+    $messageForm.submit(function(e){
+            e.preventDefault();
 
-    //         var request = new XMLHttpRequest();
-    //         var filename = '/addChat'
-    //         request.open('POST',filename)
-    //         request.setRequestHeader("content-Type","application/JSON")
-    //         request.send(JSON.stringify(ob));
-    //         request.onload = function()
-    //         {
+            // this object is for mesg to append in the chat
+            var mesgObj = {}
+            mesgObj.chatid = currPersonchatid
+            mesgObj.senderName = "<%= obj.username %>"
+            mesgObj.chat =  $('#message').val();
+            // mesgObj.sendTime = 
 
-    //         }
+            console.log(mesgObj)
+            var request = new XMLHttpRequest();
+            var filename = '/addChatToDb'
+            request.open('POST',filename)
+            request.setRequestHeader("content-Type","application/JSON")
+            request.send(JSON.stringify(mesgObj));
+            request.onload = function()
+            {
+                console.log(request.responseText)
+                 var socketob = new Object()
+                 socketob.senderid = "<%= obj._id %>"
+                 socketob.recieverid =  currReceiverid;
+                 socketob.chat =  mesgObj.chat 
+                 socketob.senderName = "<%= obj.username %>"
+
+                
+
+                socket.emit('send-message',socketob,function(data){
+                    
+                    // $chat.append('<span class="error"><b>'+data+ '</span><br/>')
+                    
+                    // data from callback
+                    console.log(data)
+                    var senderOb = {};
+                    senderOb.senderName = "<%= obj.username %>"
+                    senderOb.chat = mesgObj.chat 
+                    addChatHistoryDom(senderOb)
+                })
+            }
             
-    // })
+    })
     
     function fetchMyChats()
     {
@@ -145,9 +182,52 @@
         console.log(connectedchatId)
 
         var html=''
-        html+='<div id="myfrienddiv'+mychatPerson._id+'"><a>'+mychatPerson.username+ '</a><button onclick=sendChat("'+mychatPerson._id+'","'+connectedchatId+'")>chat</button></div>'
+        html+='<div id="myfrienddiv'+mychatPerson._id+'"><a>'+mychatPerson.username+ '</a><button onclick=sendChat("'+mychatPerson.username+'","'+mychatPerson._id+'","'+connectedchatId+'")>chat</button></div>'
         $('#my-chats').append(html)
+         
     }
+    
+    function sendChat(friendUsername ,friendId , connectedchatId)
+    {
+        $('#chatTop').html('');
+        $('#chat').html('');
+        $('#chatTop').html(friendUsername)
+        currReceiverid = friendId
+        currPersonchatid = connectedchatId
+        console.log('%%%%%%%%%%%%%%'+currReceiverid+'%%%%%%%%%%%%%')
+        // get the chat messages from the database
+        var ob = {}
+        ob.chatid = connectedchatId;
+        var request = new XMLHttpRequest();
+        var filename = '/getChatHistory'
+        request.open('POST',filename)
+        request.setRequestHeader("content-Type","application/JSON")
+        request.send(JSON.stringify(ob));
+        request.onload = function()
+        {
+            // console.log(request.responseText)
+            var arr = JSON.parse(request.responseText)
+            // arr contanins messages and id of the chat
+            console.log(arr)
+            console.log('!!!!!!!!!!!!!!')
+            for(var i = 0;i<arr.message.length;i++)
+            {
+                // console.log(arr.message[i])
+                addChatHistoryDom(arr.message[i]);
+            }
+        }
+        // get messages and append to message dom
+
+    }
+    function addChatHistoryDom(ob)
+    {
+        console.log(ob)
+        var html='';
+        html+='<div><button class="btn btn-primary">'+ob.senderName+'</button><br><div>'+ob.chat+'</div></div><br>'
+        $('#chat').append(html)
+
+    }
+
     
     function fetchfriends()
     {
