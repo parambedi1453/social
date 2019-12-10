@@ -59,16 +59,17 @@ var personSchema = new mongoose.Schema({
 
     username : String,
     password : String,
-    friend : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
+    friend : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'  }],
     requestin: [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
     requestout: [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
-    personchat : [{type : mongoose.Schema.Types.ObjectId,ref:'chats'}]
+    personchat: [{type : mongoose.Schema.Types.ObjectId,ref:'chats'}]
 })
 const person = mongoose.model('persons',personSchema)
 
 var chatSchema = new mongoose.Schema({
-    firstfriend : {type : mongoose.Schema.Types.ObjectId , ref :'persons'},
-    secondfriend : {type : mongoose.Schema.Types.ObjectId,ref :'persons'},
+    // firstfriend : [{type : mongoose.Schema.Types.ObjectId , ref :'persons'}],
+    // secondfriend : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
+    members : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
     message : [],
     lastmodified : Number
 })
@@ -123,6 +124,37 @@ app.post('/getFriends',function(req,res){
         res.send(result)
     })
 })
+app.post('/getChats' , function(req,res){
+
+//     User.
+//   findOne({ name: 'Val' }).
+//   populate({
+//     path: 'friends',
+//     // Get friends of friends - populate the 'friends' array for every friend
+//     populate: { path: 'friends' }
+//   });
+    
+    person.findOne({"_id" : req.session.data._id}).
+    populate({
+        path : 'personchat' ,
+        populate : { 
+            path : 'members' ,select :{'username' : 1},
+            // path : 'firstfriend' ,select :{'username' : 1},
+            // path : 'secondfriend',select :{'username' : 1}
+        }
+        // populate : { path : 'firstfriend' ,select :{'username' : 1}},
+    }).exec(function(err , result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log(result)
+            res.send(result);
+        }
+    })
+
+  
+})
 app.post('/addFriends',function(req,res){
 
     console.log(req.body)
@@ -151,6 +183,7 @@ app.post('/getRequests',function(req,res){
 })
 app.post('/sendRequest',function(req,res){
 
+   
     person.updateOne({"_id" : req.body.id },{ $push : { requestin : req.session.data._id }},function(err,result){
         if(err)
         throw err;
@@ -162,8 +195,12 @@ app.post('/sendRequest',function(req,res){
                 else
                 {
                     var ob = new Object();
-                    ob.firstfriend = req.body.id;
-                    ob.secondfriend = req.session.data._id;
+                    // ob.firstfriend = req.body.id;
+                    // ob.secondfriend = req.session.data._id;
+                    arr = [];
+                    arr.push(req.body.id)
+                    arr.push(req.session.data._id)
+                    ob.members = arr;
                     ob.message = [];
                     ob.lastmodified = Date.now()
 
@@ -230,21 +267,22 @@ app.post('/acceptRequest' , function(req,res){
 
 //   app.listen(3000,()=> console.log('server is running'))
 
-// users = {}
+users = {}
 
-// io.sockets.on('connection' ,function(socket){
+io.sockets.on('connection' ,function(socket){
 
-//     socket.on('new user' , function(data,callback){
-//         if(data in users){
-//             callback(false)
-//         }else{
-//             callback(true)
-//             socket.nickname = data;
-//             users[socket.nickname] = socket
-//             // io.sockets.emit('usernames',nicknames)
-//             updateNicknames();
-//         }
-//     })
+    socket.on('new user' , function(data,callback){
+        if(data in users){
+            callback(false)
+        }else{
+            callback(true)
+            users[data] = socket.id
+            
+            // io.sockets.emit('usernames',nicknames)
+           
+        }
+    })
+})
 
 //     socket.on('send message' , function(data,callback){
 

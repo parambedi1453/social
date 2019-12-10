@@ -35,11 +35,120 @@
                 </div>
             </div>
         </div>
+
+        <br/>
+        <br/>
+        <!-- Beginging of the chat dom -->
+        <center><h3>Chatss</h3></center>
+        <div class="row">
+            <div class="col">
+                <center><h3>Chats</h3></center>
+                <buttton class="btn btn-primary" onclick="fetchMyChats()"><a>My Chats</a></buttton>
+                <div id="my-chats">
+
+                </div>
+            </div>
+            <div class="col">
+                <center><h3>chat area</h3></center>
+                <div id="contentWrap">
+                    <div id="chatWrap">
+                        <center><div id="chatTop"></div></center>
+                         <div id="chat" style="height:450px;border : 1px #000 solid;"></div>
+                             <form id="send-message">
+                                 <input size="35" id="message" />
+                                 <input type="submit" />
+                             </form>
+                    </div>
+                    <div id="users">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>
+<script src = "http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script>
 
+    const senderid  = "<%= obj._id %>"
+    let recieverid ;
+    var socket = io.connect();
+    var $messageForm = $('#send-message')
+
+
+    // socket.emit('new user' ,senderid ,function(data){
+    //     if(data)
+    //     {
+    //         console.log('Valid User ')
+    //     }
+    //     else
+    //     {
+    //         console.log('not valid already logged in')
+    //     }
+    // })
+    // $messageForm.submit(function(e){
+    //         e.preventDefault();
+
+    //         var ob = new Object()
+    //         ob.id =  recieverid;
+    //         ob.chat = $('#message').val();
+
+    //         var request = new XMLHttpRequest();
+    //         var filename = '/addChat'
+    //         request.open('POST',filename)
+    //         request.setRequestHeader("content-Type","application/JSON")
+    //         request.send(JSON.stringify(ob));
+    //         request.onload = function()
+    //         {
+
+    //         }
+            
+    // })
+    
+    function fetchMyChats()
+    {
+        var ob = new Object()
+        ob.id = "<%= obj._id %>"
+        var request = new XMLHttpRequest();
+        var filename = '/getChats'
+        request.open('POST',filename)
+        request.setRequestHeader("content-Type","application/JSON")
+        request.send(JSON.stringify(ob));
+        request.onload = function()
+        {
+            console.log(request.responseText)
+            console.log('%%%%%%%%%%%%%%%')
+            var arrOfObject = JSON.parse(request.responseText)
+            console.log(arrOfObject)
+            console.log('&&&&&&&&&&&&&&&&&')
+            console.log(arrOfObject.personchat)
+
+            console.log('************')
+            // personchat is an array 
+            for(var i=0;i<arrOfObject.personchat.length ; i++)
+            {
+                var chatobj = arrOfObject.personchat[i];
+                console.log(chatobj)
+                
+                if(chatobj.members[0]._id == "<%= obj._id %>")
+                    addToChatDom(chatobj.members[1],arrOfObject.personchat[i]._id)
+                else
+                    addToChatDom(chatobj.members[0],arrOfObject.personchat[i]._id)
+            }
+        }
+    }
+    function addToChatDom(mychatPerson , connectedchatId)
+    {
+        console.log('^^^^^^^^^^^^^^^^^^^')
+        console.log(mychatPerson)
+        console.log(connectedchatId)
+
+        var html=''
+        html+='<div id="myfrienddiv'+mychatPerson._id+'"><a>'+mychatPerson.username+ '</a><button onclick=sendChat("'+mychatPerson._id+'","'+connectedchatId+'")>chat</button></div>'
+        $('#my-chats').append(html)
+    }
+    
     function fetchfriends()
     {
         var ob = new Object();
@@ -67,6 +176,8 @@
         html+='<div id="myfrienddiv'+ob._id+'"><a>'+ob.username+ '</a></div>'
         $('#my-friends').append(html)
     }
+
+
     function addfriends()
     {
         var ob = new Object();
