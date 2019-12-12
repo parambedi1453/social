@@ -20,10 +20,6 @@ var io = require('socket.io').listen(server)
 
 server.listen(3000);
 
-
-users = {}
-
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -55,26 +51,7 @@ mongoose.connection.on('error',(err) => {
     console.log('DB connected');
   })
 
-var personSchema = new mongoose.Schema({
 
-    username : String,
-    password : String,
-    friend : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'  }],
-    requestin: [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
-    requestout: [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
-    personchat: [{type : mongoose.Schema.Types.ObjectId,ref:'chats'}]
-})
-const person = mongoose.model('persons',personSchema)
-
-var chatSchema = new mongoose.Schema({
-    // firstfriend : [{type : mongoose.Schema.Types.ObjectId , ref :'persons'}],
-    // secondfriend : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
-    members : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
-    message : [],
-    lastmodified : Number
-})
-
-const chatinstance  = mongoose.model('chats',chatSchema) 
 
   app.get('/',function(req,res){
       res.render('loginpage')
@@ -318,6 +295,12 @@ io.sockets.on('connection' ,function(socket){
                 callback('user is not online and mesg sent to chatDb')
             }
         })
+
+        // socket.on('disconnect',function(data){
+        //             if(!socket.nickname) return;
+        //             delete users[socket.nickname]
+                   
+        //         })
  })
 
 
