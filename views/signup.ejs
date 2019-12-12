@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>sign up</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css">
+  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+    <style>
+        body{
+    background: url(mountain.jpg) no-repeat center center fixed;
+    background-size: cover;
+        }
+
+        .main-section{
+            margin : 0 auto;
+            margin-top: 130px;
+            padding : 0;
+        }
+        .modal-content{
+            background-color: #3b4652;
+            opacity: .95;
+            padding: 0 18px;
+            box-shadow: 0px 0px 3px #848484;
+        }
+        .user-img{
+            margin-top : -50px;
+            margin-bottom :35px;
+        }
+        .user-img img{
+            height : 100px;
+            width : 100px;
+            border-radius : 5px;
+            box-shadow: 0px 0px 2px #848484;
+        }
+        .form-group
+        {
+            margin-bottom:25px;
+        }
+        .form-group input{
+            height : 42px;
+            border-radius : 5px;
+            border :0;
+            font-size : 18px;
+            padding-left:54px ;
+        }
+
+
+
+        .btn {
+            background-color: dodgerblue;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .btn:hover {
+            opacity: 1;
+        }
+
+        /* alert div styles */
+        .alert {
+            padding: 20px;
+            background-color: #f44336;
+            color: white;
+            opacity: 1;
+            transition: opacity 0.6s;
+            margin-bottom: 15px;
+            }
+
+            .alert.success {background-color: #4CAF50;}
+            .alert.info {background-color: #2196F3;}
+            .alert.warning {background-color: #ff9800;}
+
+            .closebtn
+             {
+            margin-left: 15px;
+            color: white;
+            font-weight: bold;
+            float: right;
+            font-size: 22px;
+            line-height: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            }
+
+            .closebtn:hover {
+            color: black;
+            }
+
+    </style>
+</head>
+<body>
+
+
+<div class="container">
+   
+   <div class="col-sm-12 text-center">
+       <h3>Sign Up</h3>
+        <p>Please fill in this form to create an account</p>
+   </div> 
+   <!-- alert divs -->
+   <div class="alert" id="alreadyExistDiv" style="display: none;">
+        <span class="closebtn" id="close1">&times;</span>  
+        <strong>Cannot register ! </strong>Account already created.
+      </div>
+      
+      <div class="alert success" id="accountCreatedDiv" style="display: none;">
+        <span class="closebtn" id="close2"><a href="/">LOGIN </a></span>  
+        <strong>Account Created!</strong>Login To Enter the fun world.
+      </div>
+      
+    <!-- alert divs end -->
+    <div class="modal-dialog text-center">
+            <div class="col-sm-10 main-section">
+                <div class="modal-content">
+                    <div class="col-12 user-img">
+                        <img src="default.png">
+                    </div>
+                    <form  class="col-12" id="register-form">
+                        <div class="form-group">
+                            <i class="fa fa-user icon"></i>
+                           <input id="username" type="text" class="form-control" placeholder="Username">
+                        </div>
+                        <div class="form-group">
+                            <i class="fa fa-envelope"></i>
+                            <input id="email" type="text" class="form-control" placeholder="Email">
+                        </div>
+                         <div class="form-group">
+                            <i class="fa fa-phone"></i>
+                            <input id="phone" type="text" class="form-control" placeholder="Phone Number">
+                        </div>
+                        <div class="form-group">
+                            <i class="fa fa-key"></i>
+                            <input id="password" type="Password" class="form-control" placeholder="Password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>   
+                </div><!-- end of modal contenet-->
+         </div>
+    </div>
+    
+</div>
+</body>
+<script>
+    jQuery(function($){
+        var $registerForm = $('#register-form')
+        var $username = $('#username');
+        var $email = $('#email');
+        var $phone = $('#phone');
+        var $password = $('#password');
+       
+        var clickday = getcurrday();
+
+        
+
+        $registerForm.submit(function(e){
+            e.preventDefault();
+
+            var ob = {}
+            ob.username = $username.val();
+            ob.email = $email.val();
+            ob.phone = $phone.val();
+            ob.password = $password.val();
+            ob.joindate = clickday;
+
+            var request = new XMLHttpRequest();
+            var filename = '/registerUser';
+            request.open('POST',filename)
+            request.setRequestHeader("content-Type","application/JSON")
+            request.send(JSON.stringify(ob));
+            request.onload = function()
+            {
+                // console.log(request.responseText);
+                var result = request.responseText
+                console.log(result)
+                if(result=='AccountCreated')
+                {
+                    $('#accountCreatedDiv').show();
+                    var close = document.getElementById('close2')
+                    close.onclick = function(){
+                        var div = this.parentElement;
+                        div.style.opacity = "0";
+                        setTimeout(function(){ div.style.display = "none"; }, 600);
+                     }
+                }
+                else if(result=='EmailExist')
+                {
+                    $('#alreadyExistDiv').show();
+                    var close = document.getElementById('close1')
+                    close.onclick = function(){
+                        var div = this.parentElement;
+                        div.style.opacity = "0";
+                        setTimeout(function()
+                        { div.style.display = "none"; }, 600);
+                     }
+                }
+
+            }
+
+        })
+
+        function getMonths(monthno)
+        {
+            var month=["Jan","Feb","Mar","Apr","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            return month[monthno-1];
+        }
+        function getcurrday()
+        {
+            var clickday = new Date();
+            var dd = clickday.getDate();
+            var mm = clickday.getMonth();
+            var yyyy = clickday.getFullYear();
+            var hrs = clickday.getHours();
+            var mins = clickday.getMinutes();
+            var format = "AM";
+            if(hrs>12)
+            {
+                hrs = hrs-12;
+                format="PM";
+            }
+            clickday = + dd + '-' + getMonths(mm) + '-' + yyyy;
+            clickday = clickday + " ( " + hrs + ':' + mins + ' ' + format + " )";
+            // console.log(clickday);
+            return clickday
+        }
+
+    })
+</script>
+</html>
+
+
+   

@@ -52,10 +52,13 @@ mongoose.connection.on('error',(err) => {
   })
 
 
+// Routes 
+const indexRouter = require('./routes/index')
 
-  app.get('/',function(req,res){
-      res.render('loginpage')
-  })
+
+// using Routes
+app.use('/',indexRouter)
+ 
   
   app.post('/login',function(req,res){
 
