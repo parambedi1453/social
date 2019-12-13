@@ -79,40 +79,6 @@ app.post('/getFriends',function(req,res){
         res.send(result)
     })
 })
-app.post('/getChats' , function(req,res){
-
-//     User.
-//   findOne({ name: 'Val' }).
-//   populate({
-//     path: 'friends',
-//     // Get friends of friends - populate the 'friends' array for every friend
-//     populate: { path: 'friends' }
-//   });
-    
-    person.findOne({"_id" : req.session.data._id}).
-    populate({
-        path : 'personchat' ,
-        populate : { 
-            path : 'members' ,select :{'username' : 1},
-            // path : 'firstfriend' ,select :{'username' : 1},
-            // path : 'secondfriend',select :{'username' : 1}
-        }
-        // populate : { path : 'firstfriend' ,select :{'username' : 1}},
-    }).exec(function(err , result){
-        if(err)
-        throw err;
-        else
-        {
-            console.log(result)
-            res.send(result);
-        }
-    })
-
-  
-})
-
-
-
 
 
 app.post('/addchatToDb' , (req,res)=>{
@@ -132,19 +98,7 @@ app.post('/addchatToDb' , (req,res)=>{
     })
 })
 
-app.post('/getChatHistory' , function(req,res){
 
-    chatinstance.findOne({"_id" : req.body.chatid}).select('message').exec(function(err,result){
-        if(err)
-        throw err;
-        else
-        {
-            console.log('send chat hostory')
-            res.send(result)
-        }
-    })
-       
-})
 
 users = {}
 io.sockets.on('connection' ,function(socket){

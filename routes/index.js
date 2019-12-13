@@ -16,6 +16,9 @@ router.get('/register' , (req,res)=>{
 router.get('/home',(req,res)=>{
     res.render('home', {obj : req.session.data})
 })
+router.get('/chat' , (req,res)=>{
+    res.render('chat',{obj : req.session.data})
+})
 
 router.post('/registeruser' ,(req,res) => {
 
@@ -170,6 +173,67 @@ router.post('/acceptRequest' , function(req,res){
                 }
             })
             
+        }
+    })
+})
+
+router.post('/getChats' , function(req,res){
+
+    //     User.
+    //   findOne({ name: 'Val' }).
+    //   populate({
+    //     path: 'friends',
+    //     // Get friends of friends - populate the 'friends' array for every friend
+    //     populate: { path: 'friends' }
+    //   });
+        
+        person.findOne({"_id" : req.session.data._id}).
+        populate({
+            path : 'personchat' ,
+            populate : { 
+                path : 'members' ,select :{'username' : 1 ,'status' :1},
+                // path : 'firstfriend' ,select :{'username' : 1},
+                // path : 'secondfriend',select :{'username' : 1}
+            }
+            // populate : { path : 'firstfriend' ,select :{'username' : 1}},
+        }).exec(function(err , result){
+            if(err)
+            throw err;
+            else
+            {
+                console.log(result)
+                res.send(result);
+            }
+        })  
+})
+
+router.post('/getChatHistory' , function(req,res){
+
+    chatinstance.findOne({"_id" : req.body.chatid}).select('message').exec(function(err,result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log('send chat hostory')
+            res.send(result)
+        }
+    })
+       
+})
+
+router.post('/addchatToDb' , (req,res)=>{
+
+    var chatid = req.body.chatid;
+    var ob = {}
+    ob.senderName = req.body.senderName
+    ob.chat = req.body.chat
+    chatinstance.updateOne({"_id" : chatid},{$push :{message  : ob}},function(err,result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log(result)
+            res.send('chat added to db')
         }
     })
 })
