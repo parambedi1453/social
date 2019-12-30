@@ -81,22 +81,6 @@ app.post('/getFriends',function(req,res){
 })
 
 
-app.post('/addchatToDb' , (req,res)=>{
-
-    var chatid = req.body.chatid;
-    var ob = {}
-    ob.senderName = req.body.senderName
-    ob.chat = req.body.chat
-    chatinstance.updateOne({"_id" : chatid},{$push :{message  : ob}},function(err,result){
-        if(err)
-        throw err;
-        else
-        {
-            console.log(result)
-            res.send('chat added to db')
-        }
-    })
-})
 
 
 
@@ -108,6 +92,7 @@ io.sockets.on('connection' ,function(socket){
                 callback(false)
             }else{
                 callback(true)
+                // the data here is the mongo id of the user just enetrd
                 users[data] = socket
                 
                 // io.sockets.emit('usernames',nicknames)
@@ -134,13 +119,19 @@ io.sockets.on('connection' ,function(socket){
             }
         })
 
-        // socket.on('disconnect',function(data){
-        //             if(!socket.nickname) return;
-        //             delete users[socket.nickname]
-                   
-        //         })
- })
+        socket.on('disconnect', () => {
+            console.log('user disconnected');
+            
+            function getKeyByValue(object, value) { 
+            return Object.keys(object).find(key =>
+                object[key] === value); 
+            }
 
+            ans = getKeyByValue(users, socket); 
+            delete users[ans];
+        })
+
+})
 
 
 
@@ -206,3 +197,16 @@ io.sockets.on('connection' ,function(socket){
 
 //     }
 // })
+
+
+// socket.on('disconnect', () => {
+//     console.log('user disconnected');
+//     function getKeyByValue(object, value) { 
+//       return Object.keys(object).find(key =>
+//         object[key] === value); 
+//     }
+
+//     ans = getKeyByValue(users, socket.id); 
+//     users[ans] = "";
+
+//   });

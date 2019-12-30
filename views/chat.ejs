@@ -18,10 +18,10 @@
 
 </head>
 <body>
-    <div class="container" style="margin-top:70px;max-height:85%">
+    <div class="container" style="margin-top:25px;max-height:75%">
         <div class="row no-gutters"> <!--no-gutters remove the padding added by the bootstrap-->
-            <div class="col-md-4 border-right" id="my-chats" style="height : 800px;">
-                <div class="settings-trey">
+            <div class="col-md-4 border-right"  style="height : 800px;">
+                <div class="settings-trey" >
                     <img class="profile-image"src = "face.png" alt="Profile image">
                     <span class="settings-trey--right float-right">
                         <i class="material-icons">cached</i>
@@ -35,8 +35,11 @@
                         <input type="text" placeholder="search here">
                     </div>
                 </div>
+                <div id="my-chats" style="height: 680px;overflow-y: scroll">
 
-                <div class="friend-drawer friend-drawer--onhover">
+                </div>
+
+                <!-- <div class="friend-drawer friend-drawer--onhover">
                     <img src="friend.png" class="profile-image" alt="Friend photo">
                     <div class="text">
                         <h6>ROBO COP</h6>
@@ -44,7 +47,7 @@
                     </div>
                     <span class="time small">13:12</span>
                 </div>
-                <hr>
+                <hr> -->
 
                 
                 <!--*****************  -->
@@ -52,7 +55,7 @@
             
             <!-- Right part starts here -->
             <div class="col-md-8" style="height : 800px;">
-                <div class="settings-trey">
+                <div class="settings-trey" style="height:75px;">
                     <div class="friend-drawer no-gutters friend-drawer--grey" style="padding: 0;">
                         <img class="profile-image" src="friend.png" alt="friend-image">
                         <div class="text">
@@ -66,7 +69,7 @@
                         </span> 
                     </div>
                 </div>
-                <div class="chat-panel" id="chat">
+                <div class="chat-panel" id="chat" style="height:600px;overflow-y: scroll">
                     <!-- <div class="row no-gutters">
                         <div class="col-md-3">
                             <div class="chat-bubble chat-bubble--green chat-bubble--left">
@@ -84,15 +87,13 @@
                 </div>
                    
                     
-                    <div class="row" >
-                       <div class="col-12" style="position: absolute; bottom: 0;">
+                    <div class="row" style="height: 100px;">
+                       <div class="col-12" style="position:absolute; bottom: 0;">
                             <div class="chat-box-tray">
                                     <!-- <i class="material-icons">sentiment_very_satisfied</i> -->
                                     <form id="send-message">
-                                        <input id="message" type="text" placeholder="Type Your Message...">
-                                        <button type="submit" >send</button>
-                                        <!-- <button><i class="material-icons">mic</i></button> -->
-                                       <!-- <span><input type="submit" /><i class="material-icons">send</i></span> -->
+                                                <input id="message" type="text" style="background-color: #3CBC8D; color:white;" placeholder="Type Your Message...">
+                                                <span><button type="submit" style="border-radius:40px;">send</button> </span>
                                     </form>
                             </div>
                        </div>
@@ -107,9 +108,10 @@
 <script src = "http://code.jquery.com/jquery-latest.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    // $('.friend-drawer').on('click',function(){
-    //     $('.chat-bubble').hide('slow').show('slow')
-    // })
+    $('.friend-drawer').on('click',function(){
+        $('#chat').hide('slow').show('slow')
+    })
+
 </script>
 <script>
     const senderid  = "<%= obj._id %>"
@@ -165,6 +167,7 @@
                  socketob.chat =  mesgObj.chat 
                  socketob.senderName = "<%= obj.username %>"
 
+                 $('#message').val("");
                 
 
                 socket.emit('send-message',socketob,function(data){
@@ -182,7 +185,7 @@
             
     })
 
-    
+
     fetchMyChats();
 
     
@@ -278,7 +281,7 @@
     {
         console.log(ob)
         var html='';
-        html+='<div><button class="btn btn-primary">'+ob.senderName+'</button><br><div>'+ob.chat+'</div></div><br>'
+        // html+='<div><button class="btn btn-primary">'+ob.senderName+'</button><br><div>'+ob.chat+'</div></div><br>'
        
         if(ob.senderName == "<%= obj.username %>")
         {
@@ -303,7 +306,7 @@
 
         $('#chat').append(html)
     }
-
+    
 
 </script>
 </html>
