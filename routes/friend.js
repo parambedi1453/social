@@ -9,4 +9,7 @@ router.get('/friendRequests' , (req,res) => {
     res.render('friendrequest' , {obj : req.session.data});
 })
 
+router.get('/makeGroups' , (req,res) =>{
+    res.render('groups' , {obj : req.session.data})
+})
 module.exports = router
