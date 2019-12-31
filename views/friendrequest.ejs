@@ -8,7 +8,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <title>DashBoard</title>
+    <title>Lets Connect</title>
+    <style>
+        .card-horizontal {
+         display: flex;
+        flex: 1 1 auto;
+      }
+    </style>
 </head>
 <body>
         <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
@@ -66,9 +72,29 @@
     }
     function addRequestdom(ob)
     {
-        var html=''
-        html+='<div id="requestDiv'+ob._id+'"><a>'+ob.username+ '</a><button onclick=acceptRequest("'+ob._id+'")>Accept Request</button></div>'
-        $('#my-requests').append(html)
+        // var html=''
+        // html+='<div id="requestDiv'+ob._id+'"><a>'+ob.username+ '</a><button onclick=acceptRequest("'+ob._id+'")>Accept Request</button></div>'
+        // $('#my-requests').append(html)
+
+        var html = ''
+        html+= '<div class="row" id="requestDiv'+ob._id+'">'
+          +'<div class="col-12 mt-3">'
+              +'<div class="card">'
+                  +'<div class="card-horizontal">'
+                      +'<div class="img-square-wrapper" style="width : 250px;">'
+                          +'<img src="/face.png" alt="Card image cap" style="height:120px;">'
+                      +'</div>'
+                      +'<div class="card-body">'
+                          +'<h4 class="card-title">'+ob.username+ '</h4>'
+                          +'<button onclick=acceptRequest("'+ob._id+'")>Accept Request</button>'
+                      +'</div>'
+                  +'</div>'
+              +'</div>'
+          +'</div>'
+      +'</div>'
+
+      $('#my-requests').append(html)
+
     }
 
     function acceptRequest(id)
