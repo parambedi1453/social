@@ -37,14 +37,38 @@
                 </ul>
               </nav>
 
-        <div class="container">
-            <div id="my-friends">
+        <div class="container" >
+          <div class="row" style="height: 700px;">
+            <div class="col-6" style="overflow-y: scroll">
+              <div id="my-friends">
 
+              </div>
             </div>
+            <div class="col-6">
+              <div id="make-group" style="height:600px; overflow-y: scroll">
+                <center><h2>Members Selected</h2></center>
+                <div id="group-members">
+
+                </div>
+              </div>
+              <div class="row" style="height: 100px;">
+                <div class="col-12" style="position:absolute; bottom: 0;">
+                  <div class="chat-box-tray">
+                    <!-- <i class="material-icons">sentiment_very_satisfied</i> -->
+                       <form id="create-group">
+                          <input id="groupName" type="text" style="background-color: #3CBC8D; color:white;" placeholder="Enter Group Name....">
+                          <span><button type="submit" style="border-radius:40px;">Create Group</button> </span>
+                        </form>
+                            </div>
+                       </div>
+                    </div>
+            </div>
+          </div>
         </div>
 </body>
 <script>
 
+    var groupMembersArr = []; 
     myfriends();
 
     function myfriends()
@@ -59,8 +83,79 @@
         request.send(JSON.stringify(ob));
         request.onload = function()
         {
-            console.log(request.responseText)
+            var arrOfObject = JSON.parse(request.responseText)
+            var arrOfFriend = arrOfObject.friend;
+            // console.log(arrOfFriend)
+            for(var i = 0;i<arrOfFriend.length;i++)
+            {
+                addToFriendDom(arrOfFriend[i]);
+            }
         }
+    }
+
+    function addToFriendDom(ob)
+    {
+        var html = ''
+        html+= '<div class="row" id="myfrienddiv'+ob._id+'">'
+          +'<div class="col-12 mt-3">'
+              +'<div class="card">'
+                  +'<div class="card-horizontal">'
+                      +'<div class="img-square-wrapper" style="width : 250px;">'
+                          +'<img src="/face.png" alt="Card image cap" style="height:120px;">'
+                      +'</div>'
+                      +'<div class="card-body">'
+                          +'<h4 class="card-title">'+ob.username+ '</h4>'
+                          +'<button onclick=addFriendToGroup("'+ob._id+'","'+ob.username+'")>Add Member</button>'
+                      +'</div>'
+                  +'</div>'
+              +'</div>'
+          +'</div>'
+      +'</div>'
+
+      $('#my-friends').append(html)
+    }
+
+    function addFriendToGroup(id,username)
+    {
+      groupMembersArr.push(id)
+      $('#myfrienddiv'+id).hide();
+      var html = ''
+        html+= '<div class="row" id="groupMemberDiv'+id+'">'
+          +'<div class="col-12 mt-3">'
+              +'<div class="card">'
+                  +'<div class="card-horizontal">'
+                      +'<div class="img-square-wrapper" style="width : 250px;">'
+                          +'<img src="/face.png" alt="Card image cap" style="height:120px;">'
+                      +'</div>'
+                      +'<div class="card-body">'
+                          +'<h4 class="card-title">'+username+ '</h4>'
+                          +'<button onclick=removeFriend("'+id+'","'+username+'")>Remove Member</button>'
+                      +'</div>'
+                  +'</div>'
+              +'</div>'
+          +'</div>'
+      +'</div>'
+
+      $('#group-members').append(html)
+
+
+    }
+    function removeFriend(id,username)
+    {
+      // console.log("before************");
+      // console.log(groupMembersArr)
+      for(var i = 0 ;i<groupMembersArr.length;i++)
+      {
+        if(groupMembersArr[i]==id)
+        {
+          groupMembersArr.splice(i,1);
+        }
+      }
+      // console.log("after************");
+      // console.log(groupMembersArr)
+
+      $('#groupMemberDiv'+id).remove();
+      $('#myfrienddiv'+id).show();
     }
 
 </script>

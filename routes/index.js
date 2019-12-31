@@ -106,6 +106,7 @@ router.post('/getFriends' , function(req,res){
             res.send(result)
         }
     })
+    
 })
 router.post('/sendRequest',function(req,res){
 
