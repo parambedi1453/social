@@ -86,6 +86,27 @@ router.post('/addFriends',function(req,res){
     
 })
 
+router.post('/getFriends' , function(req,res){
+
+    // var query = dbSchemas.SomeValue.find({}).select('name -_id');
+
+    // query.exec(function (err, someValue) {
+    //     if (err) return next(err);
+    //     res.send(someValue);
+    // });
+
+    var query = [{path : 'friend' , select :{'username' : 1}}];
+    person.findOne({"_id" : req.body.id}).populate(query).exec(function(err,result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log('****Frinnds for group*****')
+            // console.log(result)
+            res.send(result)
+        }
+    })
+})
 router.post('/sendRequest',function(req,res){
 
    

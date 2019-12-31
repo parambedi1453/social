@@ -43,5 +43,25 @@
             </div>
         </div>
 </body>
+<script>
 
+    myfriends();
+
+    function myfriends()
+    {
+        var ob = {}
+        ob.id = "<%= obj._id%>"
+
+        var request = new XMLHttpRequest();
+        var filename = '/getFriends'
+        request.open('POST',filename)
+        request.setRequestHeader("content-Type","application/JSON")
+        request.send(JSON.stringify(ob));
+        request.onload = function()
+        {
+            console.log(request.responseText)
+        }
+    }
+
+</script>
 </html>
