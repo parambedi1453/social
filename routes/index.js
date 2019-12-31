@@ -3,6 +3,7 @@ const router = express.Router()
 
 const person = require('../models/person')
 const chatinstance = require('../models/chat')
+const groupinstance = require('../models/group')
 
 
 router.get('/',(req,res) => {
@@ -259,5 +260,6 @@ router.post('/addchatToDb' , (req,res)=>{
         }
     })
 })
+
 
 module.exports = router

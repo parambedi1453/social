@@ -69,6 +69,8 @@
 <script>
 
     var groupMembersArr = []; 
+    var $groupForm = $('#create-group')
+
     myfriends();
 
     function myfriends()
@@ -157,6 +159,27 @@
       $('#groupMemberDiv'+id).remove();
       $('#myfrienddiv'+id).show();
     }
+
+    $groupForm.submit(function(e){
+      e.preventDefault();
+
+      var groupobj = {}
+
+      groupobj.name = $('#groupName').val();
+      groupobj.members = groupMembersArr;
+      groupobj.owner = "<%= obj._id %>"
+
+      var request = new XMLHttpRequest();
+      var filename = '/createGroup'
+      request.open('POST',filename)
+      request.setRequestHeader("content-Type" , "application/JSON")
+      request.send(JSON.stringify(groupobj))
+      request.onload = function()
+      {
+        console.log(request.responseText)
+      }
+
+    })
 
 </script>
 </html>

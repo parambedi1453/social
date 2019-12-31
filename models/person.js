@@ -12,7 +12,8 @@ var personSchema = new mongoose.Schema({
     friend : [{type : mongoose.Schema.Types.ObjectId,ref :'persons'  }],
     requestin: [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
     requestout: [{type : mongoose.Schema.Types.ObjectId,ref :'persons'}],
-    personchat: [{type : mongoose.Schema.Types.ObjectId,ref:'chats'}]
+    personchat: [{type : mongoose.Schema.Types.ObjectId,ref:'chats'}],
+    groupconnected : [{type : mongoose.Schema.Types.ObjectId , ref :'groups'}]
 })
 const person = mongoose.model('persons',personSchema)
 module.exports = person;
