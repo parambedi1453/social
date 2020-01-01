@@ -69,6 +69,7 @@
 <script>
 
     var groupMembersArr = []; 
+    
     var $groupForm = $('#create-group')
 
     myfriends();
@@ -103,7 +104,7 @@
               +'<div class="card">'
                   +'<div class="card-horizontal">'
                       +'<div class="img-square-wrapper" style="width : 250px;">'
-                          +'<img src="/face.png" alt="Card image cap" style="height:120px;">'
+                          +'<img src="/face.png" alt="Card image cap" style="height:120px;border-radius:50%;">'
                       +'</div>'
                       +'<div class="card-body">'
                           +'<h4 class="card-title">'+ob.username+ '</h4>'
@@ -127,7 +128,7 @@
               +'<div class="card">'
                   +'<div class="card-horizontal">'
                       +'<div class="img-square-wrapper" style="width : 250px;">'
-                          +'<img src="/face.png" alt="Card image cap" style="height:120px;">'
+                          +'<img src="/face.png" alt="Card image cap" style="height:120px;border-radius:50%;">'
                       +'</div>'
                       +'<div class="card-body">'
                           +'<h4 class="card-title">'+username+ '</h4>'
@@ -163,22 +164,37 @@
     $groupForm.submit(function(e){
       e.preventDefault();
 
-      var groupobj = {}
-
-      groupobj.name = $('#groupName').val();
-      groupobj.members = groupMembersArr;
-      groupobj.owner = "<%= obj._id %>"
-
-      var request = new XMLHttpRequest();
-      var filename = '/createGroup'
-      request.open('POST',filename)
-      request.setRequestHeader("content-Type" , "application/JSON")
-      request.send(JSON.stringify(groupobj))
-      request.onload = function()
+      if(groupMembersArr.length == 0)
       {
-        console.log(request.responseText)
+        alert("NO MEMBERS SELECTED");
+        window.location = "/friends/makeGroups"
       }
 
+      
+      else
+      {
+          // adding the member who is making the group
+          groupMembersArr.push("<%= obj._id %>")
+
+          var groupobj = {}
+
+          groupobj.name = $('#groupName').val();
+          groupobj.members = groupMembersArr;
+          groupobj.owner = "<%= obj._id %>"
+
+          $('#groupName').val('')
+          var request = new XMLHttpRequest();
+          var filename = '/createGroup'
+          request.open('POST',filename)
+          request.setRequestHeader("content-Type" , "application/JSON")
+          request.send(JSON.stringify(groupobj))
+          request.onload = function()
+          {
+            console.log(request.responseText)
+            window.location = "/home"
+          }
+
+      }
     })
 
 </script>

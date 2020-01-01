@@ -261,5 +261,28 @@ router.post('/addchatToDb' , (req,res)=>{
     })
 })
 
+router.post('/createGroup',(req,res) => {
 
+    groupinstance.create(req.body,(err,result)=>{
+        if(err)
+        throw err;
+        else
+        {
+            console.log(result._id)
+            for(var i =0;i<req.body.members.length; i++)
+            {
+                console.log(req.body.members[i]);
+                person.updateOne({"_id" : req.body.members[i]},{$push : {groupconnected : result._id}},function(err,result2){
+                    if(err)
+                    throw err;
+                    else
+                     {
+                         console.log("id added to peronsGrop")
+                     }
+                 })
+            }
+            res.send('done')
+        }
+    })
+})
 module.exports = router
