@@ -99,7 +99,18 @@ io.sockets.on('connection' ,function(socket){
                
             }
         })
-
+        socket.on('group-connected' , function(data,callback){
+            if(data in users){
+                callback(false)
+            }else{
+                callback(true)
+                // the data here is the mongo id of the user just enetrd
+                users[data] = socket
+                
+                // io.sockets.emit('usernames',nicknames)
+               
+            }
+        })
         socket.on('send-message' , function(data,callback){
 
             console.log('IN SEND MESSG')

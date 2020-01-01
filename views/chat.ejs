@@ -33,14 +33,15 @@
                     <div class="input-wrapper">
                         <!-- <i class="material-icons">search</i>
                         <input type="text" placeholder="search here"> -->
-                        <button style="border-radius: 4px; margin-left:45px;">Chats</buttton>
-                        <button style="border-radius: 4px;float:right; margin-right:45px;">Groups</button>
+                        <button id="show-chats" style="border-radius: 4px; margin-left:45px;">Chats</buttton>
+                        <button id="show-groups" style="border-radius: 4px;float:right; margin-right:45px;">Groups</button>
                     </div>
                 </div>
                 <div id="my-chats" style="height: 680px;overflow-y: scroll">
 
                 </div>
-                
+                <div id="my-groups" style="display : none; height: 680px;overflow-y: scroll">
+                </div>
 
                 <!-- <div class="friend-drawer friend-drawer--onhover">
                     <img src="friend.png" class="profile-image" alt="Friend photo">
@@ -98,6 +99,10 @@
                                                 <input id="message" type="text" style="background-color: #3CBC8D; color:white;" placeholder="Type Your Message...">
                                                 <span><button type="submit" style="border-radius:40px;">send</button> </span>
                                     </form>
+                                    <form id="send-groupmessage" style="display: none;">
+                                        <input id="groupmessage" type="text" style="background-color: #3CBC8D; color:white;" placeholder="Type Your Message...">
+                                        <span><button type="submit" style="border-radius:40px;">send</button> </span>
+                                </form>
                             </div>
                        </div>
                     </div>
@@ -120,8 +125,10 @@
     const senderid  = "<%= obj._id %>"
     let currReceiverid;
     let currPersonchatid;
+    let currGroupId;
     var socket = io.connect();
     var $messageForm = $('#send-message')
+    var $groupForm = $('#send-groupmessage')
 
     socket.emit('new user' ,senderid ,function(data){
         if(data)
@@ -134,8 +141,8 @@
         }
     })
     socket.on('wisper' , function(data){
-        console.log('@@@@@@@@@   IN WISPERRR @@@@@@@@@'+data.senderName)
-        console.log(data)
+        // console.log('@@@@@@@@@   IN WISPERRR @@@@@@@@@'+data.senderName)
+        // console.log(data)
         if(data.senderid == currReceiverid)
         {
             var ob = {}
@@ -155,7 +162,7 @@
             mesgObj.chat =  $('#message').val();
             // mesgObj.sendTime = 
 
-            console.log(mesgObj)
+            // console.log(mesgObj)
             var request = new XMLHttpRequest();
             var filename = '/addChatToDb'
             request.open('POST',filename)
@@ -163,7 +170,7 @@
             request.send(JSON.stringify(mesgObj));
             request.onload = function()
             {
-                console.log(request.responseText)
+                // console.log(request.responseText)
                  var socketob = new Object()
                  socketob.senderid = "<%= obj._id %>"
                  socketob.recieverid =  currReceiverid;
@@ -178,7 +185,7 @@
                     // $chat.append('<span class="error"><b>'+data+ '</span><br/>')
                     
                     // data from callback
-                    console.log(data)
+                    // console.log(data)
                     var senderOb = {};
                     senderOb.senderName = "<%= obj.username %>"
                     senderOb.chat = mesgObj.chat 
@@ -188,10 +195,22 @@
             
     })
 
+    $('#show-chats').click(function(){
+        $('#my-groups').hide();
+        $('#my-chats').show();
+        $('#send-groupmessage').hide();
+        $('#send-message').show();
+    })
+    $('#show-groups').click(function(){
+        $('#my-chats').hide();
+        $('#my-groups').show();
+        $('#send-message').hide();
+        $('#send-groupmessage').show();
+       
+    })
 
-    fetchMyChats();
-
-    
+    fetchMyChats(); 
+    fetchMyGroups()  ; 
     function fetchMyChats()
     {
         var ob = new Object()
@@ -203,19 +222,19 @@
         request.send(JSON.stringify(ob));
         request.onload = function()
         {
-            console.log(request.responseText)
-            console.log('%%%%%%%%%%%%%%%')
+            // console.log(request.responseText)
+            // console.log('%%%%%%%%%%%%%%%')
             var arrOfObject = JSON.parse(request.responseText)
-            console.log(arrOfObject)
-            console.log('&&&&&&&&&&&&&&&&&')
-            console.log(arrOfObject.personchat)
+            // console.log(arrOfObject)
+            // console.log('&&&&&&&&&&&&&&&&&')
+            // console.log(arrOfObject.personchat)
 
-            console.log('************')
+            // console.log('************')
             // personchat is an array 
             for(var i=0;i<arrOfObject.personchat.length ; i++)
             {
                 var chatobj = arrOfObject.personchat[i];
-                console.log(chatobj)
+                // console.log(chatobj)
                 
                 if(chatobj.members[0]._id == "<%= obj._id %>")
                     addToChatDom(chatobj.members[1],arrOfObject.personchat[i]._id)
@@ -226,9 +245,9 @@
     }
     function addToChatDom(mychatPerson , connectedchatId)
     {
-        console.log('^^^^^^^^^^^^^^^^^^^')
-        console.log(mychatPerson)
-        console.log(connectedchatId)
+        // console.log('^^^^^^^^^^^^^^^^^^^')
+        // console.log(mychatPerson)
+        // console.log(connectedchatId)
 
         var html=''
         // html+='<div id="myfrienddiv'+mychatPerson._id+'"><a>'+mychatPerson.username+ '</a><button onclick=sendChat("'+mychatPerson.username+'","'+mychatPerson._id+'","'+connectedchatId+'")>chat</button></div>'
@@ -256,7 +275,7 @@
         
         currReceiverid = friendId
         currPersonchatid = connectedchatId
-        console.log('%%%%%%%%%%%%%%'+currReceiverid+'%%%%%%%%%%%%%')
+        // console.log('%%%%%%%%%%%%%%'+currReceiverid+'%%%%%%%%%%%%%')
         // get the chat messages from the database
         var ob = {}
         ob.chatid = connectedchatId;
@@ -270,8 +289,8 @@
             // console.log(request.responseText)
             var arr = JSON.parse(request.responseText)
             // arr contanins messages and id of the chat
-            console.log(arr)
-            console.log('!!!!!!!!!!!!!!')
+            // console.log(arr)
+            // console.log('!!!!!!!!!!!!!!')
             for(var i = 0;i<arr.message.length;i++)
             {
                 // console.log(arr.message[i])
@@ -309,7 +328,145 @@
 
         $('#chat').append(html)
     }
+
+   
+    function fetchMyGroups()
+    {
+        var ob = {}
+        ob.id =  "<%= obj._id %>"
+        var request = new XMLHttpRequest();
+        var filename = '/getGroups'
+        request.open('POST',filename)
+        request.setRequestHeader("content-Type","application/JSON")
+        request.send(JSON.stringify(ob));
+        request.onload = function()
+        {
+            console.log('^^^^^^^^^^^^^^^^^^^^^^_____________^^^^^^^^^^^^')
+            // console.log(request.responseText)
+            var arrOfObject = JSON.parse(request.responseText)
+
+            for(var i=0;i<arrOfObject.groupconnected.length;i++)
+            {
+                var groupObj = arrOfObject.groupconnected[i];
+                addToGroupDom(groupObj.name,arrOfObject.groupconnected[i]._id);
+            }
+        }
+    }
+
+    function addToGroupDom(groupName , groupId)
+    {
+        var html=''
+        // html+='<div id="myfrienddiv'+mychatPerson._id+'"><a>'+mychatPerson.username+ '</a><button onclick=sendChat("'+mychatPerson.username+'","'+mychatPerson._id+'","'+connectedchatId+'")>chat</button></div>'
+        // $('#my-chats').append(html)
+
+       html+= '<div class="friend-drawer friend-drawer--onhover" onclick=sendGroupChat("'+groupName+'","'+groupId+'")>'
+                    +'<img src="friend.png" class="profile-image" alt="Friend photo">'
+                    +'<div class="text">'
+                        +'<h6>'+groupName+ '</h6>'
+                        +'<p>add status</p>'
+                    +'</div>'
+                    +'<span class="time small">13:12</span>'
+                +'</div>'
+                +'<hr>'
+        $('#my-groups').append(html)
+    }
     
+    function sendGroupChat(groupName,groupId)
+    {
+        console.log(groupName);
+        console.log(groupId)
+            socket.emit('group-connected' ,groupId ,function(data){
+            if(data)
+            {
+                console.log('Group activated ')
+            }
+            else
+            {
+                console.log('group already activated')
+            }
+        })
+
+        $('#chatTop').html('');
+        $('#chatTop').html(groupName)
+        $('#chatTopStatus').html('');
+        $('#chatTopStatus').html('group status');
+        $('#chat').html('');
+
+        currGroupId = groupId
+        var ob = {};
+        ob.groupid = groupId
+        var request = new XMLHttpRequest();
+        var filename = '/getgroupChatHistory'
+        request.open('POST',filename)
+        request.setRequestHeader("content-Type","application/JSON")
+        request.send(JSON.stringify(ob));
+        request.onload = function()
+        {
+            console.log(request.responseText)
+            var arr = JSON.parse(request.responseText)
+
+            for(var i=0;i<arr.message.length;i++)
+            {
+                displayGroupChat(arr.message[i]);
+            }
+        }
+    }
+
+    function displayGroupChat(ob)
+    {
+        console.log(ob)
+        var html='';
+        // html+='<div><button class="btn btn-primary">'+ob.senderName+'</button><br><div>'+ob.chat+'</div></div><br>'
+       
+        if(ob.senderName == "<%= obj.username %>")
+        {
+            html+='<div class="row no-gutters">'
+                +'<div class="col-md-3 offset-md-9">'
+                    +'<div class="chat-bubble chat-bubble--cyan chat-bubble--right">'
+                      +ob.chat+
+                    '</div>'
+                 +'</div>'
+           +'</div>'
+        }
+        else
+        {
+            html+= '<div class="row no-gutters">'
+                +'<div class="col-md-3">'
+                    +'<div class="chat-bubble chat-bubble--green chat-bubble--left">'
+                        +ob.chat+
+                    '</div>'
+                +'</div>'
+            +'</div>'
+        }
+
+        $('#chat').append(html)
+    }
+
+    $groupForm.submit(function(e){
+        e.preventDefault();
+
+        var mesgObj = {}
+        mesgObj.chatgroupid = currGroupId
+        mesgObj.senderName = "<%= obj.username %>"
+        mesgObj.chat =  $('#groupmessage').val();
+
+        var request = new XMLHttpRequest();
+        var filename = '/addGroupChatToDb'
+        request.open('POST',filename)
+        request.setRequestHeader("content-Type","application/JSON")
+        request.send(JSON.stringify(mesgObj));
+        request.onload = function()
+        {
+            console.log(request.responseText)
+
+            var socketob = new Object()
+            socketob.senderid = "<%= obj._id %>"
+            socketob.recieverid =  currReceiverid;
+            socketob.chat =  mesgObj.chat 
+            socketob.senderName = "<%= obj.username %>"
+
+        }
+    })
 
 </script>
 </html>

@@ -243,6 +243,17 @@ router.post('/getChatHistory' , function(req,res){
     })
        
 })
+router.post('/getgroupChatHistory' , function(req,res){
+    groupinstance.findOne({"_id" : req.body.groupid}).select('message').exec(function(err,result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log('send chat hostory')
+            res.send(result)
+        }
+    })
+})
 
 router.post('/addchatToDb' , (req,res)=>{
 
@@ -257,6 +268,22 @@ router.post('/addchatToDb' , (req,res)=>{
         {
             console.log(result)
             res.send('chat added to db')
+        }
+    })
+})
+router.post('/addGroupchatToDb' , (req,res) => {
+
+    var groupid = req.body.chatgroupid
+    var ob = {}
+    ob.senderName = req.body.senderName
+    ob.chat = req.body.chat
+    groupinstance.updateOne({"_id" : groupid},{$push :{message  : ob}},function(err,result){
+        if(err)
+        throw err;
+        else
+        {
+            console.log(result)
+            res.send('chat added to groupppp db')
         }
     })
 })
@@ -282,6 +309,21 @@ router.post('/createGroup',(req,res) => {
                  })
             }
             res.send('done')
+        }
+    })
+})
+
+router.post('/getGroups' ,(req,res) => {
+    var query = [{path : 'groupconnected',select :{'name' : 1 , lastmodified : 1}}];
+    person.findOne({"_id" : req.body.id}).populate(query).exec(function(err,result){
+
+        if(err)
+        throw err;
+        else
+        {
+            console.log('************')
+            console.log(result)
+            res.send(result)
         }
     })
 })
